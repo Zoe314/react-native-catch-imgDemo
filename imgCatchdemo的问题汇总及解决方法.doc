@@ -1,0 +1,168 @@
+img-catch组件： https://www.jianshu.com/p/268273698455
+
+1、使用react-native-img-cache这个的前提需要react-native-fetch-blob(用来下载图片的吧（猜测）),
+所以需要
+npm install --save react-native-fetch-blob
+react-native link
+
+其他的方式参考react-native-fetch-blob主页
+2、导入react-native-img-cache --save
+npm install react-native-img-cache --save
+
+3、使用
+import {CachedImage, ImageCache} from "react-native-img-cache";
+
+CachedImage:用来显示图片
+ImageCache:用来管理的，比如获取图片的路径、清理缓存神马的
+
+4、加载图片
+<CachedImage
+                    style={{width:100, height: 100}}
+                    source={{ uri: "http://h.hiphotos.baidu.com/zhidao/wh%3D600%2C800/sign=d8d47aee8435e5dd9079add946f68bd7/f31fbe096b63f624fc76a3bf8644ebf81a4ca367.jpg" }} />
+
+5、管理图片
+// 获取图片的缓存路径
+ Let a ="http://h.hiphotos.baidu.com/zhidao/wh%3D600%2C800/sign=d8d47aee8435e5dd9079add946f68bd7/f31fbe096b63f624fc76a3bf8644ebf81a4ca367.jpg";
+        let sss = ImageCache.get().getPath(a);
+        console.log(sss);
+        
+// 清理缓存
+        ImageCache.get().clear();
+
+
+6、还有更多其他的操作，取消啊、直接从本地读啦等等的，具体的可以看react-native-img-cache主页(https://github.com/wcandillon/react-native-img-cache)
+
+
+在本地下载react-native-fetch-blob，react-native-img-cache遇到的问题：
+
+Module does not exiist in the module map or in these derectories    检查路径
+
+unable to resolve module 'expo' from 
+watchman: command not found   检查路径、、
+
+could not find method compile() for arguments [project ':react-native-fetch-b
+有的需要下载AndroidSDK的包，缺包的要下载所需要的及提示的SDK包
+
+undefined  is  not an object (evaluating 'RNFetchBlob.DocumentDir')
+
+
+
+ Scanning 685 folders for symlinks in E:\aPritice\catchDemo\node_modules (32ms)
+Starting JS server...
+Building and installing the app on the device (cd android && gradlew.bat installDebug)...
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file 'E:\aPritice\catchDemo\android\build.gradle' line: 27
+
+* What went wrong:
+Could not compile build file 'E:\aPritice\catchDemo\android\build.gradle'.
+> startup failed:
+  build file 'E:\aPritice\catchDemo\android\build.gradle': 27: unexpected token: - @ line 27, column 25.
+      compile project(▒▒:react-native-fetch-blob▒▒)
+                             ^
+
+  1 error
+
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+
+BUILD FAILED
+
+Total time: 4.362 secs
+Could not install the app on the device, read the error above for details.
+Make sure you have an Android emulator running or a device connected and have
+set up your Android development environment:
+https://facebook.github.io/react-native/docs/android-setup.html
+
+参考链接：
+https://stackoverflow.com/questions/47946494/cannot-read-property-documentdir-of-undefined-react-native-firebase-react-nati
+https://stackoverflow.com/questions/43835848/react-native-fetch-blob-undefined-is-not-an-object-evaluating-rnfetchblob-do
+ 解决方案：http://www.bubuko.com/infodetail-2082024.html
+
+
+方法如下：
+　　　首先看一下最外层package.json下是否有“react-native-fetch-blob”该依赖包
+　　　
+　　　如果没有
+　　　
+　　　就执行下面命令行：
+　　　
+　　　$ npm install --save react-native-fetch-blob@0.10.5
+　　　
+　　　如果react-native-fetch-blob版本较低，移除原有包
+　　　$ rnpm uninstall react-native-fetch-blob
+　　　重新按上面安装
+　　　react-native版本< 0.29 
+　　　$ rnpm link
+　　　react-native版本 0.29.2+
+　　　$ react-native link
+　　　执行$ rnpm link或rnpm uninstall时可能提示：
+　　　
+　　　
+　　　
+　　　参考 https://github.com/rnpm/rnpm 执行命令行：
+　　　
+　　　$ npm install rnpm -g
+　　　
+　　　再执行$ rnpm link或rnpm uninstall
+　　　如果出现以下提示：
+　　　
+　　　
+　　　
+　　　可参考react-native-fetch-blob\README.md文件：
+　　　
+　　　react-native版本< 0.29
+　　　
+　　　$ RNFB_ANDROID_PERMISSIONS=true rnpm link
+　　　
+　　　react-native版本 0.29.2+
+　　　$ RNFB_ANDROID_PERMISSIONS=true react-native link
+　　　自动添加权限（亲测RNFB_ANDROID_PERMISSIONS不是内部或外部命令，未解决）。或者用以下手动添加：
+　　　
+　　　在settings.gradle中添加
+　　　
+　　　rootProject.name = 'catchDemo'
+　　　include ':app'
+　　　include ':react-native-fetch-blob'
+　　　project(':react-native-fetch-blob').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fetch-blob/android')
+　　　
+　　　如果node_modules在工作空间根目录，../省略
+　　　
+　　　在app/build.gradle
+　　　dependencies {
+　　　  +  compile project(':react-native-fetch-blob')
+　　　    compile fileTree(dir: "libs", include: ["*.jar"])
+　　　    compile "com.android.support:appcompat-v7:23.0.1"
+　　　    compile "com.facebook.react:react-native:+"  // From node_modules
+　　　}
+　　　在MainApplication或Activity添加包
+　　　
+　　　+ import com.RNFetchBlob.RNFetchBlobPackage;
+　　　
+　　　```
+　　　高版本下
+　　　复制代码
+　　　1 @Override
+　　　2     protected List<ReactPackage> getPackages() {
+　　　3       return Arrays.<ReactPackage>asList(
+　　　4          new RNFetchBlobPackage(),                                                                                                                             
+　　　5    +      new MainReactPackage()
+　　　6       );
+　　　7     }
+　　　复制代码
+　　　 
+　　　
+　　　 低版本下
+　　　
+　　　1 mReactRootView = new ReactRootView(this);
+　　　2 mReactInstanceManager = ReactInstanceManager.builder()
+　　　3 .addPackage(new RNFetchBlobPackage())
+　　　4 .build();
+　　　5 mReactRootView.startReactApplication(mReactInstanceManager, "Task", null);
+　　　6 setContentView(mReactRootView);
+　　　
+　　　
+　　　修改完成----->>>react-native run-android
